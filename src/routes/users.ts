@@ -6,7 +6,13 @@ import { sortAndPaginate } from '../common/utils';
 import { PaginatedResponse } from '../common/paginated-response';
 
 const usersRouter = express.Router();
+usersRouter.get('/', async (req, res) => {
+  const page = Number.isInteger(+req.query.page) ? +req.query.page : 1;
+  const limit = Number.isInteger(+req.query.limit) ? +req.query.limit : 4;
 
+  const data = await fetchUsers(page, limit);
+  await res.send(data);
+});
 const fetchUsers = async (
   page = 1,
   limit = 4
@@ -21,12 +27,5 @@ const fetchUsers = async (
   const sorted = sortAndPaginate(start, end, users, 'name');
   return new PaginatedResponse(sorted, page, totalCount);
 };
-usersRouter.get('/', async (req, res, next) => {
-  const page = Number.isInteger(+req.query.page) ? +req.query.page : 1;
-  const limit = Number.isInteger(+req.query.limit) ? +req.query.limit : 4;
-
-  const data = await fetchUsers(page, limit);
-  await res.send(data);
-});
 
 export { usersRouter };
